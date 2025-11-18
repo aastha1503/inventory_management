@@ -6,18 +6,18 @@ item_bp = Blueprint("items", __name__)
 
 
 # POST /api/items → Create a new product
-@item_bp.route("/", methods=["POST"])
+@item_bp.route("", methods=["POST"])
 @jwt_required()           #@jwt_required() decorator forces JWT validatio
 def create_item():
     data = request.get_json()
     print("Received JSON:", data)
 
 
-    name = data.get("name")
-    sku = data.get("sku")
-    category = data.get("category")
-    quantity = data.get("quantity")
-    unit_price = data.get("unit_price")
+    name = data.get("name")     #Product name
+    sku = data.get("sku")      #Stock Keeping Unit (unique product code)
+    category = data.get("category")   #Category like electronics, grocery etc..
+    quantity = data.get("quantity")    #Number of pieces in stock
+    unit_price = data.get("unit_price")   #Price of one item
     supplier_id = data.get("supplier_id")
 
     if not name or not sku:

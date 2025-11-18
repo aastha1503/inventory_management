@@ -23,13 +23,14 @@ class Product:
         db.commit()
         cursor.close()
 
+   
     @staticmethod
     def add_product(name, sku, category, quantity, unit_price, supplier_id=None):
         """Insert a new product into the database."""
         cursor = db.cursor()
         cursor.execute("""
             INSERT INTO products (name, sku, category, quantity, unit_price, supplier_id)
-            VALUES (%s, %s, %s, %s, %s, %s)
+            VALUES (%s, %s, %s, %d, %.2f, %d)
         """, (name, sku, category, quantity, unit_price, supplier_id))
         db.commit()
         cursor.close()
