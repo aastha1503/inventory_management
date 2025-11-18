@@ -1,0 +1,36 @@
+from flask import Flask, jsonify
+from route.auth import auth_bp
+from route.items import item_bp
+from flask_jwt_extended import JWTManager
+from dotenv import load_dotenv
+from flask_cors import CORS
+import os
+
+load_dotenv()
+
+app = Flask(__name__)
+
+# Enable CORS for Android access
+CORS(app)
+
+# JWT Config
+app.config["JWT_SECRET_KEY"] = os.getenv("JWT_SECRET_KEY")
+app.config["JWT_TOKEN_LOCATION"] = ["headers"]
+app.config["JWT_ACCESS_TOKEN_EXPIRES"] = 3600
+
+jwt = JWTManager(app)
+
+@jwt.unauthorized_loader
+def handle_missing_token(err):
+    return jsonify({"error": "Missing or invalid access token"}), 401
+
+@jwt.expired_token_loader
+def handle_expired_token(jwt_header, jwt_payload):
+    return jsonify({"error": "Token has expired"}), 401
+
+# Routes
+app.register_blueprint(auth_bp, url_prefix="/api/auth")
+app.register_blueprint(item_bp, url_prefix="/api/items")
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=5000, debug=True)
