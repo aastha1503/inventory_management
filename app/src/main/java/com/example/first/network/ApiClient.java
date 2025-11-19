@@ -14,7 +14,8 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class ApiClient {
-    private static final String BASE_URL = "http://192.168.1.100:5000/"; // your Flask IP
+    private static final String BASE_URL = "192.168.1.14:5000+`";
+    // your Flask IP
     private static Retrofit retrofit = null;
 
     public static Retrofit getClient(Context context) {
