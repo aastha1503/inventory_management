@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:padding="12dp"
+    android:background="#FFFFFF"
+    android:elevation="4dp"
+    android:layout_margin="4dp"
+    android:layout_width="0dp"
+    android:layout_height="100dp"
+    android:layout_weight="1"
+    android:gravity="center">
+
+    <TextView
+        android:id="@+id/textTotalItemsTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Total Items"
+        android:textSize="14sp"
+        android:textColor="#444" />
+
+    <TextView
+        android:id="@+id/cardTotalItems"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="350"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:textColor="#000" />
+
+</LinearLayout>
