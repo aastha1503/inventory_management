@@ -4,7 +4,14 @@ from route.items import item_bp
 from flask_jwt_extended import JWTManager
 from dotenv import load_dotenv
 from flask_cors import CORS
+from route.ai_routes.ai_api import ai_bp
+from models.product_model import Product
+from models.sales_model import SalesModel
+from models.user_model import User
+
+
 import os
+import sys
 
 load_dotenv()
 
@@ -31,6 +38,13 @@ def handle_expired_token(jwt_header, jwt_payload):
 # Routes
 app.register_blueprint(auth_bp, url_prefix="/api/auth")
 app.register_blueprint(item_bp, url_prefix="/api/items")
+app.register_blueprint(ai_bp, url_prefix="/api/ai")
+
+print("📌 Creating database tables...")
+User.create_table()
+Product.create_table()
+SalesModel.create_table()
+print("✅ Tables created successfully!")
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)

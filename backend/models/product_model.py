@@ -1,4 +1,4 @@
-# models/product_model.py
+# backend/models/product_model.py
 from db import db_connect as db
 
 class Product:
@@ -18,19 +18,19 @@ class Product:
                 unit_price DECIMAL(10,2) DEFAULT 0.00,
                 supplier_id INT,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            );
+            ) ENGINE=InnoDB;
         """)
         db.commit()
         cursor.close()
+        print("✅ Products table ready.")
 
-   
     @staticmethod
     def add_product(name, sku, category, quantity, unit_price, supplier_id=None):
         """Insert a new product into the database."""
         cursor = db.cursor()
         cursor.execute("""
             INSERT INTO products (name, sku, category, quantity, unit_price, supplier_id)
-            VALUES (%s, %s, %s, %d, %.2f, %d)
+            VALUES (%s, %s, %s, %s, %s, %s)
         """, (name, sku, category, quantity, unit_price, supplier_id))
         db.commit()
         cursor.close()
@@ -38,12 +38,34 @@ class Product:
 
     @staticmethod
     def get_all_products():
-        """Fetch all products."""
+        """Fetch all products as raw tuples."""
         cursor = db.cursor()
         cursor.execute("SELECT * FROM products")
         products = cursor.fetchall()
         cursor.close()
         return products
+
+    @staticmethod
+    def get_all_products_dict():
+        """Fetch all products as list of dicts (AI-friendly)."""
+        cursor = db.cursor()
+        cursor.execute("SELECT * FROM products")
+        products = cursor.fetchall()
+        cursor.close()
+
+        result = []
+        for p in products:
+            result.append({
+                "id": p[0],
+                "name": p[1],
+                "sku": p[2],
+                "category": p[3],
+                "quantity": p[4],
+                "unit_price": float(p[5]),
+                "supplier_id": p[6],
+                "created_at": str(p[7])
+            })
+        return result
 
     @staticmethod
     def get_product_by_id(product_id):
@@ -58,8 +80,6 @@ class Product:
     def update_product(product_id, name=None, sku=None, category=None, quantity=None, unit_price=None, supplier_id=None):
         """Update an existing product."""
         cursor = db.cursor()
-
-        # Build dynamic SQL for only provided fields
         updates = []
         values = []
 
@@ -83,7 +103,7 @@ class Product:
             values.append(supplier_id)
 
         if not updates:
-            print(" No fields to update.")
+            print("⚠ No fields to update.")
             return
 
         query = f"UPDATE products SET {', '.join(updates)} WHERE id = %s"
