@@ -1,6 +1,7 @@
 from flask import Flask, jsonify
 from route.auth import auth_bp
 from route.items import item_bp
+from route.sales import sales_bp
 from flask_jwt_extended import JWTManager
 from dotenv import load_dotenv
 from flask_cors import CORS
@@ -38,6 +39,7 @@ def handle_expired_token(jwt_header, jwt_payload):
 # Routes
 app.register_blueprint(auth_bp, url_prefix="/api/auth")
 app.register_blueprint(item_bp, url_prefix="/api/items")
+app.register_blueprint(sales_bp, url_prefix="/api/sales")
 app.register_blueprint(ai_bp, url_prefix="/api/ai")
 
 print("📌 Creating database tables...")

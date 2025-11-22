@@ -38,7 +38,9 @@ class Product:
 
     @staticmethod
     def get_all_products():
-        """Fetch all products as raw tuples."""
+        """Fetch all products as raw tuples.
+        Backend uses tuples internally
+        """
         cursor = db.cursor()
         cursor.execute("SELECT * FROM products")
         products = cursor.fetchall()
@@ -47,7 +49,9 @@ class Product:
 
     @staticmethod
     def get_all_products_dict():
-        """Fetch all products as list of dicts (AI-friendly)."""
+        """Fetch all products as list of dicts (AI-friendly).
+        Frontend uses JSON dictionaries
+        """
         cursor = db.cursor()
         cursor.execute("SELECT * FROM products")
         products = cursor.fetchall()

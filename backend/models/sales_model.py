@@ -9,12 +9,10 @@ class SalesModel:
     def create_table():
         """
         Create the sales_history table with a foreign key to products.
-        This method is safe to run multiple times.
+        Safe to run multiple times.
         """
         try:
             cursor = db.cursor()
-
-            # Step 1: Create table if it doesn't exist
             cursor.execute("""
                 CREATE TABLE IF NOT EXISTS sales_history (
                     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -25,9 +23,8 @@ class SalesModel:
                 ) ENGINE=InnoDB;
             """)
             db.commit()
-            print("✅ sales_history table created (if not exists).")
 
-            # Step 2: Add foreign key if it doesn't already exist
+            # Check if foreign key exists
             cursor.execute("""
                 SELECT CONSTRAINT_NAME
                 FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS
@@ -44,30 +41,20 @@ class SalesModel:
                     ON DELETE CASCADE;
                 """)
                 db.commit()
-                print("✅ Foreign key added successfully.")
-            else:
-                print("⚠ Foreign key already exists, skipping.")
 
             cursor.close()
+            print("✅ sales_history table checked/created.")
 
         except Exception as e:
             db.rollback()
             print("❌ Error creating sales_history table:", e)
-            try:
-                cursor.close()
-            except:
-                pass
+            traceback.print_exc()
+            try: cursor.close()
+            except: pass
 
     @staticmethod
     def add_sale(product_id, qty, sale_date):
-        """
-        Record a sale.
-        Args:
-            product_id: int, ID of the product
-            qty: int, number of units sold
-            sale_date: str in 'YYYY-MM-DD' format
-        Returns True if inserted successfully, else False
-        """
+        """Record a sale."""
         try:
             cursor = db.cursor()
             cursor.execute("""
@@ -76,28 +63,18 @@ class SalesModel:
             """, (product_id, qty, sale_date))
             db.commit()
             cursor.close()
-            print(f"✅ Sale recorded: product_id={product_id}, qty={qty}, date={sale_date}")
             return True
         except Exception as e:
             db.rollback()
             print("❌ Error recording sale:", e)
             traceback.print_exc()
-            try:
-                cursor.close()
-            except:
-                pass
+            try: cursor.close()
+            except: pass
             return False
 
     @staticmethod
     def get_sales_history(product_id, days=None):
-        """
-        Get sales history for a product.
-        Args:
-            product_id: int
-            days: int, optional. If provided, fetch only last N days.
-        Returns:
-            List of tuples: [(sale_date, qty), ...]
-        """
+        """Get sales history for a product. Optionally filter by last N days."""
         try:
             cursor = db.cursor()
             if days:
@@ -114,21 +91,17 @@ class SalesModel:
                 """, (product_id,))
             rows = cursor.fetchall()
             cursor.close()
-            return [(str(r[0]), int(r[1])) for r in rows]
+            return [{"sale_date": str(r[0]), "qty": int(r[1])} for r in rows]
         except Exception as e:
             print("❌ Error fetching sales history:", e)
-            try:
-                cursor.close()
-            except:
-                pass
+            traceback.print_exc()
+            try: cursor.close()
+            except: pass
             return []
 
     @staticmethod
     def get_total_sales(product_id):
-        """
-        Get total quantity sold for a product.
-        Returns integer sum of qty.
-        """
+        """Get total quantity sold for a product."""
         try:
             cursor = db.cursor()
             cursor.execute("""
@@ -140,8 +113,52 @@ class SalesModel:
             return int(total) if total else 0
         except Exception as e:
             print("❌ Error calculating total sales:", e)
-            try:
-                cursor.close()
-            except:
-                pass
+            traceback.print_exc()
+            try: cursor.close()
+            except: pass
             return 0
+
+    @staticmethod
+    def get_top_selling_products(limit=5):
+        """Get top-selling products by total quantity sold."""
+        try:
+            cursor = db.cursor()
+            cursor.execute("""
+                SELECT p.id, p.name, SUM(s.qty) as total_sold
+                FROM sales_history s
+                JOIN products p ON s.product_id = p.id
+                GROUP BY p.id, p.name
+                ORDER BY total_sold DESC
+                LIMIT %s
+            """, (limit,))
+            rows = cursor.fetchall()
+            cursor.close()
+            return [{"product_id": r[0], "product_name": r[1], "total_sold": int(r[2])} for r in rows]
+        except Exception as e:
+            print("❌ Error fetching top-selling products:", e)
+            traceback.print_exc()
+            try: cursor.close()
+            except: pass
+            return []
+
+    @staticmethod
+    def get_category_wise_sales():
+        """Get total sales grouped by product category."""
+        try:
+            cursor = db.cursor()
+            cursor.execute("""
+                SELECT p.category, SUM(s.qty) as total_qty
+                FROM sales_history s
+                JOIN products p ON s.product_id = p.id
+                GROUP BY p.category
+                ORDER BY total_qty DESC
+            """)
+            rows = cursor.fetchall()
+            cursor.close()
+            return [{"category": r[0], "total_qty": int(r[1])} for r in rows]
+        except Exception as e:
+            print("❌ Error fetching category-wise sales:", e)
+            traceback.print_exc()
+            try: cursor.close()
+            except: pass
+            return []
