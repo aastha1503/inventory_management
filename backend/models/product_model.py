@@ -38,9 +38,7 @@ class Product:
 
     @staticmethod
     def get_all_products():
-        """Fetch all products as raw tuples.
-        Backend uses tuples internally
-        """
+        """Fetch all products as raw tuples."""
         cursor = db.cursor()
         cursor.execute("SELECT * FROM products")
         products = cursor.fetchall()
@@ -49,9 +47,7 @@ class Product:
 
     @staticmethod
     def get_all_products_dict():
-        """Fetch all products as list of dicts (AI-friendly).
-        Frontend uses JSON dictionaries
-        """
+        """Fetch all products as list of dicts (AI-friendly)."""
         cursor = db.cursor()
         cursor.execute("SELECT * FROM products")
         products = cursor.fetchall()
@@ -79,6 +75,16 @@ class Product:
         product = cursor.fetchone()
         cursor.close()
         return product
+
+    @staticmethod
+    def get_stock(product_id):
+        """Return stock (quantity) of a product."""
+        cursor = db.cursor()
+        cursor.execute("SELECT quantity FROM products WHERE id = %s", (product_id,))
+        result = cursor.fetchone()
+        cursor.close()
+
+        return result[0] if result else None
 
     @staticmethod
     def update_product(product_id, name=None, sku=None, category=None, quantity=None, unit_price=None, supplier_id=None):
