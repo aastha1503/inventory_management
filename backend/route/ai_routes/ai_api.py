@@ -9,9 +9,8 @@ from ai_engine.forecasting.insights import InventoryInsights
 
 ai_bp = Blueprint("ai", __name__)
 
-# -----------------------------
+
 # FORECAST API
-# -----------------------------
 @ai_bp.route("/forecast/<int:product_id>", methods=["GET"])
 @jwt_required()
 def forecast(product_id):
@@ -28,9 +27,8 @@ def forecast(product_id):
     })
 
 
-# -----------------------------
-# REORDER SUGGESTION API
-# -----------------------------
+
+# REORDER API
 @ai_bp.route("/reorder/<int:product_id>", methods=["GET"])
 @jwt_required()
 def reorder(product_id):
@@ -48,9 +46,8 @@ def reorder(product_id):
     return jsonify(suggestion)
 
 
-# -----------------------------
+
 # INVENTORY INSIGHTS API
-# -----------------------------
 @ai_bp.route("/insights/<int:product_id>", methods=["GET"])
 @jwt_required()
 def insights(product_id):
@@ -67,9 +64,9 @@ def insights(product_id):
     })
 
 
-# ---------------------------------------------------------
+
 # CHARTS FOR ANDROID
-# ---------------------------------------------------------
+
 
 # 1️⃣ Daily Sales Line Chart
 @ai_bp.route("/charts/daily_sales/<int:product_id>", methods=["GET"])
